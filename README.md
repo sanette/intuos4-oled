@@ -11,7 +11,7 @@ usage: intuos4-oled.py [-h] [-f] [--clear] [-i IMAGE] [-t TEXT] [-s SPAN]
                        button
 
 positional arguments:
-  button                button number
+  button                button number, between 0 and 7
 
 optional arguments:
   -h, --help            show this help message and exit

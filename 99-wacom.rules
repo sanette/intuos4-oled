@@ -1,0 +1,13 @@
+# ==> Put this file in /etc/udev/rules.d/99-wacom.rules
+#
+# cf: https://doc.ubuntu-fr.org/udev
+# cf: /lib/udev/rules.d/65-libwacom.rules
+
+
+DRIVERS=="usb", ATTR{idVendor}=="056a", ATTR{idProduct}=="00b9", RUN+="/bin/sh -c '/usr/bin/python /usr/local/bin/intuos4oled.py init --id 0xb9 > /tmp/intuos_init'"
+
+DRIVERS=="usb", ATTR{idVendor}=="056a", ATTR{idProduct}=="00ba", RUN+="/bin/sh -c '/usr/bin/python /usr/local/bin/intuos4oled.py init --id 0xba > /tmp/intuos_init'"
+
+DRIVERS=="usb", ATTR{idVendor}=="056a", ATTR{idProduct}=="00bb", RUN+="/bin/sh -c '/usr/bin/python /usr/local/bin/intuos4oled.py init --id 0xbb > /tmp/intuos_init'"
+
+DRIVERS=="usb", ATTR{idVendor}=="056a", ATTR{idProduct}=="00bc", RUN+="/bin/sh -c '/usr/bin/python /usr/local/bin/intuos4oled.py init --id 0xbc > /tmp/intuos_init'"

@@ -16,9 +16,10 @@ import os.path
 import argparse
 import tempfile
 
-import Image
+import PIL.Image
 import struct
 
+PY3 = sys.version_info.major == 3
 CONF_PATH = os.path.join(os.path.expanduser("~"), ".intuos")
 DEVICES_PATH = "/sys/bus/hid/devices/"
 WACOM_LED = "wacom_led"
@@ -106,25 +107,24 @@ class Screen:
 
     def load(self, filename = None):
         """Load config file and update the tablet"""
-        size = TARGET_HEIGHT*TARGET_WIDTH/2
+        size = int(TARGET_HEIGHT*TARGET_WIDTH/2)
         if filename is None:
             filename = self.datafile
         if os.path.exists(filename):
             print ("Loading datafile %s"%filename)
             with open(filename, 'rb') as file:
                 l = file.readline().strip()
-                print (l)
                 for led in range(4):
                     current_led = (led == self.led)
                     for button in range(8):
                         l = file.readline().strip()
-                        if l == "Raw:":
+                        if l == b"Raw:":
                             raw = file.read(size)
                             if current_led:
                                 send_raw(raw, button, self)
                             else:
                                 self.raw[led][button] = raw
-                        elif l == "None":
+                        elif l == b"None":
                             print ("No saved image for led=%i, button=%i."%(led, button))
                         else:
                             print ("ERROR: wrong format in file %s for led=%i, button=%i."%(filename, led, button))
@@ -230,7 +230,7 @@ def get_usb_ids (): # somewhat slow; do it only once if possible.
     ids = ids.splitlines()
     wacoms = []
     for x in ids:
-       w = wacom_from_id (ids_from_string (x))
+       w = wacom_from_id (ids_from_string (x.decode('utf-8')))
        if w != []:
            wacoms += w
     if wacoms == []:
@@ -250,12 +250,14 @@ def split_path (path):
     l = path.replace(':', '.').split('.')
     return (int(l[1], 16), int(l[2], 16))
 
-def get_path ((vendor, product)):  # this is a bit slow (60ms?)
+def get_path (ids):  # this is a bit slow (60ms?)
     """Find corresponding path in DEVICES_PATH.
     """
-    print (vendor, product)
-    l = subprocess.check_output(["ls", DEVICES_PATH])
+    vendor, product = ids
+    l = subprocess.check_output(["ls", DEVICES_PATH]) # python3 : result = bytes
     l = l.splitlines()
+    if PY3:
+        l = [os.fsdecode(x) for x in l] # python3: convert bytes to str
     file = [x for x in l if split_path(x) == (vendor, product)]
     if len(file) == 0:
         print ("ERROR: no corresponding directory found in %s"%DEVICES_PATH)

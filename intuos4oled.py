@@ -493,7 +493,7 @@ if __name__ == "__main__":
                            flip = args.flip, rv = args.rv, keep_ratio = args.kr)
             else:
                 send_multi_image(args.image, args.button, args.span, screen,
-                                 args.flip, rv = args.rv, keep_ratio = args.kr)
+                                 args.flip, rv = args.rv)
 
     if args.text is not None or args.image is not None:
         screen.save()

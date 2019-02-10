@@ -72,26 +72,28 @@ intuos4oled.py update
 You need a standard Python install. It should work with Python2 (for
 instance with Ubuntu 16.4) or Python3.
 
-If you just want to test, make the script executable:
+First, make the script executable:
 ```
 chmod 755 intuos4oled.py
 ```
 
-There is nothing more to do. But, depending on your system, you may
-have to run the script with `sudo`.
+If you just want to test, there is nothing more to do. You can try:
+```
+sudo ./intuos4oled.py set -i tux.png -b 0
+```
 
-In this case, it's easier to simply do once:
+Depending on your system, the `sudo` might not be necessary. If it is, then
+it's easier to simply do once:
 ```
 sudo ./intuos4oled.py init
 ```
 
-And then for all subsequent calls, you don't need sudo anymore. You
-may try the examples above!
+And then for all subsequent calls, you don't need sudo anymore.
 
 ### Permanent installation
 
 1. Make the script executable and move it to a location in you
-   `$PATH`. Here we use /usr/local/bin. This should work for everyone.
+   `$PATH`. Here we use `/usr/local/bin`. This should work for everyone.
 
 ```
 chmod 755 intuos4oled.py

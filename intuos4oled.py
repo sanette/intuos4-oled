@@ -16,7 +16,7 @@ import os.path
 import argparse
 import tempfile
 
-import PIL.Image
+import PIL.Image as Image
 import struct
 
 PY3 = sys.version_info.major == 3

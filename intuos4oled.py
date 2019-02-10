@@ -25,6 +25,7 @@ DEVICES_PATH = "/sys/bus/hid/devices/"
 WACOM_LED = "wacom_led"
 STATUS_LED0 = "status_led0_select"
 BUTTON = "button%u_rawimg"
+LUMINANCE = "buttons_luminance"
 DEFAULT_FONT = "Ubuntu-R.ttf"
 WACOM_ID = 0x056a
 # https://github.com/linuxwacom/input-wacom/wiki/Device-IDs
@@ -46,7 +47,7 @@ def check_range (button):
 class Screen:
     """Data for the 8 button images for all 4 led positions"""
 
-    def __init__(self, ids = None, datafile = None):
+    def __init__(self, ids = None, datafile = None, sync = True):
         if ids is None:
             ids = get_usb_ids ()
         self.ids = ids
@@ -54,8 +55,11 @@ class Screen:
         self.model = w[2] + " " + w[3]
         self.path = get_path(ids)
         self.update_led()
-        if datafile is None:
-            datafile = CONF_PATH
+        if sync:
+            if datafile is None:
+                datafile = CONF_PATH
+        else:
+            datafile = None
         self.datafile = datafile
         self.raw = [[None for x in range(8)] for led in range(4)]
         self.load()
@@ -92,6 +96,8 @@ class Screen:
             self.raw[self.led][button] = raw_data
 
     def save(self, filename = None):
+        if self.datafile is None:
+            return (None)
         if filename is None:
             filename = self.datafile
         print ("Saving to %s"%filename)
@@ -107,6 +113,8 @@ class Screen:
 
     def load(self, filename = None):
         """Load config file and update the tablet"""
+        if self.datafile is None:
+            return (None)
         size = int(TARGET_HEIGHT*TARGET_WIDTH/2)
         if filename is None:
             filename = self.datafile
@@ -125,7 +133,8 @@ class Screen:
                             else:
                                 self.raw[led][button] = raw
                         elif l == b"None":
-                            print ("No saved image for led=%i, button=%i."%(led, button))
+                            #print ("No saved image for led=%i, button=%i."%(led, button))
+                            pass
                         else:
                             print ("ERROR: wrong format in file %s for led=%i, button=%i."%(filename, led, button))
 
@@ -140,11 +149,18 @@ def sudo_init (ids):
     for button in range(8):
         btn_path = os.path.join(path, BUTTON%button)
         os.chmod(btn_path, stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
+    RWALL = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH
     led_path = os.path.join(path, STATUS_LED0)
-    os.chmod(led_path, stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
-            | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    os.chmod(led_path, RWALL)
+    luminance = os.path.join(path, LUMINANCE)
+    os.chmod(luminance, RWALL)
 
-def img_to_raw (im, flip = False):
+def set_luminance (path, luminance):
+    lumi_path = os.path.join(path, LUMINANCE)
+    with open(lumi_path, 'wb') as outfile:
+        outfile.write(str(luminance))
+    
+def img_to_raw (im, flip, rv, keep_ratio = False):
     """Convert an image to a raw 1024 bytearray for the Intuos4.
 
     Suitable for displaying on one button screen.  'flip' should be True
@@ -165,24 +181,53 @@ def img_to_raw (im, flip = False):
 # The format is also scrambled, like in the USB mode, and it can
 # be summarized by converting 76543210 into GECA6420.
 #                             HGFEDCBA      HFDB7531
+
+    # Background color
+    color, name = ((255,255,255), "white") if rv else ((0,0,0), "black")
+    
+    # If there is an alpha channel, we need to blend it.
+    if 'A' in im.getbands(): 
+        print ("Blending alpha channel to %s."%name)
+        im = im.convert(mode='RGBA')
+        im2 = Image.new('RGBA', im.size, color)
+        im = Image.alpha_composite(im2, im)
+
+    # Convert to 8bit grayscale
+    im = im.convert(mode='L')
+
+    # Resize image
+    (w, h) = im.size
+    if keep_ratio:
+        if w * TARGET_HEIGHT < h * TARGET_WIDTH: # too tall
+            tw, th = w*TARGET_HEIGHT/h, TARGET_HEIGHT
+        else: # too wide
+            tw, th = TARGET_WIDTH, h*TARGET_WIDTH/w
+    else:
+        tw, th = TARGET_WIDTH, TARGET_HEIGHT
+    if w != tw or h != th:
+        print ("Warning: we need to resize the %ix%i image to %ix%i."
+                   %(w, h, tw, th))
+        im = im.resize((tw, th), Image.LANCZOS)
+
+    # Center image
+    if tw != TARGET_WIDTH or th != TARGET_HEIGHT:
+        print ("Centering image.")
+        im2 = Image.new('L', (TARGET_WIDTH, TARGET_HEIGHT), color[0])
+        if tw < TARGET_WIDTH:
+            x, y = (TARGET_WIDTH - tw)/2, 0
+        else: # we must have th < TARGET_HEIGHT:
+            x, y = 0, (TARGET_HEIGHT - th)/2
+        im2.paste(im,(x,y))
+        print(x,y)
+        im.save('/tmp/aaa.png')
         
-    #outfile = open(output, "wb")
-
-    width = im.size[0]
-    height = im.size[1]
-    if width != TARGET_WIDTH or height != TARGET_HEIGHT:
-        print ("Warning: we need to resize the %ix%i image to %ix%i"
-                   %(width, height, TARGET_WIDTH, TARGET_HEIGHT))
-        im = im.resize((TARGET_WIDTH, TARGET_HEIGHT), Image.LANCZOS)
-        print (im.size)
-
-    # convert to 8bit grayscale
-    im = im.convert(mode="L")
-
-    (w,h) = (TARGET_WIDTH, TARGET_HEIGHT)
+        im = im2
+        
+    # Convert grayscale image into interlaced 4bits raw bytes.
+    (w, h) = (TARGET_WIDTH, TARGET_HEIGHT)
     raw = bytearray(w*h/2)
     pos = 0
-    
+
     for j in range(h/2):
         (y, n1, n2) = (h - 2*j, -1, -2) if flip else (2*j, 0, 1)
         
@@ -191,18 +236,15 @@ def img_to_raw (im, flip = False):
             low = im.getpixel((x, y + n1)) >> 4  # divide by 16 to convert to 4bit grayscale 
             high = im.getpixel((x, y + n2)) & 0xF0 # (= keep only higher 4 bits)
             byte = high | low
-            #outfile.write(chr(byte))
-            raw[pos] = byte
+            raw[pos] = 255 - byte if rv else byte
             pos += 1
 
-    #outfile.close()
     return (raw)
 
 # not used
 def img_to_multi_raw(image, span, flip):
     image = Image.open(filename)
-    width = image.size[0]
-    height = image.size[1]
+    width, height = image.size
     raws = [img_to_raw(image.crop((0,i*height/btn_span, width, (i+1)*height/btn_span)), flip)
                 for i in range(span)]
     return (raws)
@@ -260,8 +302,8 @@ def get_path (ids):  # this is a bit slow (60ms?)
         l = [os.fsdecode(x) for x in l] # python3: convert bytes to str
     file = [x for x in l if split_path(x) == (vendor, product)]
     if len(file) == 0:
-        print ("ERROR: no corresponding directory found in %s"%DEVICES_PATH)
-        return (None)
+        print ("ERROR: no corresponding directory found in %s for device (%04x,%04x)"%(DEVICES_PATH, vendor, product))
+        exit (1)
     else:
         if len(file) > 1:
             print ("Warning: found more than one corresponding directory in %s"%DEVICES_PATH)
@@ -281,13 +323,15 @@ def update_raw (raw, button, screen):
     if raw != screen.get_raw(button):
         send_raw(raw, button, screen)
         
-def send_image (filename, button, screen, flip = False):
+def send_image (filename, button, screen,
+                    flip = False, rv = False, keep_ratio = False):
 
     im = Image.open(filename)
-    raw = img_to_raw(im, flip)
+    raw = img_to_raw(im, flip, rv, keep_ratio)
     update_raw (raw, button, screen)
 
-def send_multi_image (filename, top_button, btn_span, screen, flip):
+def send_multi_image (filename, top_button, btn_span, screen,
+                          flip = False, rv = False):
     """Send an image that will span vertically over several buttons.
 
     The image will start at 'top_button'. 'btn_span' is total the number
@@ -302,7 +346,7 @@ def send_multi_image (filename, top_button, btn_span, screen, flip):
     height = image.size[1]
     for i in range(btn_span):
         im = image.crop((0,i*height/btn_span, width, (i+1)*height/btn_span))
-        raw = img_to_raw(im, flip)
+        raw = img_to_raw(im, flip, rv)
         button = top_button - i if flip else top_button + i
         update_raw (raw, button, screen)
         # TODO: better to resize first and split next.
@@ -344,13 +388,18 @@ def text_to_img (text, output, font = DEFAULT_FONT, size = None, span = None):
     args2 = ["caption:%s"%text, output]
     ret = subprocess.call(args1 + resize + args2)
     if ret == 0:
-        print ("Image %s successfully created"%output)
+        #print ("Image %s successfully created"%output)
+        pass
     else:
         print ("ERROR: in creating %s"%output)
     
 def send_text (text, button, screen, flip = False, span = None,
                    font = None, size = None):
+    """Send text to button.
 
+    One can use newline break with '\n'. If 'span' is not None, the text
+    will be vertically spread over 'span' buttons.
+    """
     if font is None:
         font = DEFAULT_FONT
     _, filename = tempfile.mkstemp(prefix="wacom-", suffix=".png")
@@ -359,7 +408,7 @@ def send_text (text, button, screen, flip = False, span = None,
         send_image(filename, button, screen, flip)
     else:
         send_multi_image (filename, button, span, screen, flip)
-
+    os.remove(filename)
     
         
 #---------------------#
@@ -372,11 +421,13 @@ if __name__ == "__main__":
     parser.add_argument("command", help=", ".join(commands))
     parser.add_argument("-f", "--flip", action="store_true",
                         help="Flip images upside-down (for left-handed)")
-    parser.add_argument("--clear", action="store_true",
-                        help="Clear button")
+    parser.add_argument("--rv", action="store_true", help="Reverse video")
+    parser.add_argument("--kr", action="store_true", help="Keep image ratio")
+    parser.add_argument("--nosync", action="store_true", help="Don't synchronize images with datafile")
     parser.add_argument("-b", "--button", help="button number, between 0 and 7", type=int)
     parser.add_argument("-i", "--image", help="image file")
     parser.add_argument("--id", help="Wacom Tablet product ID")
+    parser.add_argument("--lum", help="Oled luminance, between 0 and 15")
     parser.add_argument("--font", help="Font to use for texts")
     parser.add_argument("--sync", help="Specify the file used to store and synchronize all images")
     parser.add_argument("-t", "--text", help="text message")
@@ -400,8 +451,8 @@ if __name__ == "__main__":
         sudo_init (ids)
         print ("Root initialization done.")
         exit (0)
-        
-    screen = Screen(ids, datafile = args.sync)
+
+    screen = Screen(ids, datafile = args.sync, sync = not args.nosync)
 
     
     # UPDATE
@@ -421,22 +472,31 @@ if __name__ == "__main__":
         clear_buttons(args.button, args.span, screen, args.flip)
 
     # SET
-    elif args.image is None:
-        if args.text is None:
-            print ("ERROR: Either an image file or a text message should be provided")
-            exit (1)
-
-        print ("Sending \"%s\" to button %u"%(args.text, args.button))
-        send_text(args.text, args.button, screen, flip = args.flip,
-                  span = args.span, font = args.font, size = None)
     else:
-        if args.text is not None:
-            print ("Using image %s and ignoring text %s."%(args.image, args.text))
-        if args.span is None:
-            send_image(args.image, args.button, screen, flip = args.flip)
-        else:
-            send_multi_image(args.image, args.button, args.span, screen, args.flip)
-    screen.save()
+        if args.lum is not None:
+            set_luminance(screen.path, args.lum)
+        if args.image is None:
+            if args.text is None:
+                if args.lum is None:
+                    print ("ERROR: Nothing to be set.")
+                    exit (1)
+
+            else: # text is not None
+                print ("Sending \"%s\" to button %u"%(args.text, args.button))
+                send_text(args.text, args.button, screen, flip = args.flip,
+                        span = args.span, font = args.font, size = None)
+        else: # image is not None
+            if args.text is not None:
+                print ("Using image %s and ignoring text %s."%(args.image, args.text))
+            if args.span is None:
+                send_image(args.image, args.button, screen,
+                           flip = args.flip, rv = args.rv, keep_ratio = args.kr)
+            else:
+                send_multi_image(args.image, args.button, args.span, screen,
+                                 args.flip, rv = args.rv, keep_ratio = args.kr)
+
+    if args.text is not None or args.image is not None:
+        screen.save()
     print ("Done")
     
 

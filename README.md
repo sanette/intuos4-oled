@@ -5,13 +5,14 @@ The Intuos4 is an old tablet, but it works well, and you can have fun
 playing with the small OLED screens.  There is built-in support in the
 Linux kernel, but the access to it is not so obvious (and several
 pages on the web are outdated).  The purpose of this project is to
-make it easy. It already works, but I will add more goodies if time
-permits.
+make it easy. It includes text messages, image processing, auto-saving
+profiles...
 
 ```
 python ./intuos4oled.py --help
-usage: intuos4oled.py [-h] [-f] [--clear] [-b BUTTON] [-i IMAGE] [--id ID]
-                      [--font FONT] [--sync SYNC] [-t TEXT] [-s SPAN]
+usage: intuos4oled.py [-h] [-f] [--rv] [--kr] [--nosync] [-b BUTTON]
+                      [-i IMAGE] [--id ID] [--lum LUM] [--font FONT]
+                      [--sync SYNC] [-t TEXT] [-s SPAN]
                       command
 
 positional arguments:
@@ -20,12 +21,15 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -f, --flip            Flip images upside-down (for left-handed)
-  --clear               Clear button
+  --rv                  Reverse video
+  --kr                  Keep image ratio
+  --nosync              Don't synchronize images with datafile
   -b BUTTON, --button BUTTON
                         button number, between 0 and 7
   -i IMAGE, --image IMAGE
                         image file
   --id ID               Wacom Tablet product ID
+  --lum LUM             Oled luminance, between 0 and 15
   --font FONT           Font to use for texts
   --sync SYNC           Specify the file used to store and synchronize all
                         images
@@ -72,10 +76,9 @@ intuos4oled.py update
 You need a standard Python install. It should work with Python2 (for
 instance with Ubuntu 16.4) or Python3.
 
-First, make the script executable:
-```
-chmod 755 intuos4oled.py
-```
+If you downloaded the zip from github, the script is already
+executable. But in case, type:
+``` chmod 755 intuos4oled.py ```
 
 If you just want to test, there is nothing more to do. You can try:
 ```
@@ -92,11 +95,10 @@ And then for all subsequent calls, you don't need sudo anymore.
 
 ### Permanent installation
 
-1. Make the script executable and move it to a location in you
+1. Make sure the script is executable and move it to a location in you
    `$PATH`. Here we use `/usr/local/bin`. This should work for everyone.
 
 ```
-chmod 755 intuos4oled.py
 sudo cp intuos4oled.py /usr/local/bin/
 ```
 

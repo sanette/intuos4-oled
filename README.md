@@ -33,29 +33,16 @@ optional arguments:
   -s SPAN, --span SPAN  if the image has to span over several buttons
 ```
 
-_Warning_: depending on your system, you may have to run the script with `sudo`.
-In this case, it's easier to simply do once:
-```
-sudo python ./intuos4oled.py init
-```
-And then for all subsequent calls, you don't need sudo anymore.
-
-Even better, use `udev` rules, and the initialization will be done automagically every time you plug in the tablet:
-```
-sudo cp 99-wacom.rules /etc/udev/rules.d/99-wacom.rules
-```
-(This might require a restart)
-
 ## Examples
 
 ```
-python ./intuos4oled.py set -i tux.png -b 0
+intuos4oled.py set -i tux.png -b 0
 ```
 
 This will display the "tux.png" icon on the button #0.
 
 ```
-python ./intuos4oled.py set -b 7 -i woman64.png -f -s 4
+intuos4oled.py set -b 7 -i woman64.png -f -s 4
 ```
 
 This will display the image "woman64.png" on the tablet, spanning over
@@ -63,7 +50,7 @@ This will display the image "woman64.png" on the tablet, spanning over
 '7' here is the top button in the left-handed orientation.
 
 ```
-python ./intuos4oled.py set -t "Don't forget\nthe bread" -b 2 --font "Ubuntu-C.ttf"
+intuos4oled.py set -t "Don't forget\nthe bread" -b 2 --font "Ubuntu-C.ttf"
 ```
 
 This will display some text on button #2. Notice how you can insert a
@@ -75,5 +62,43 @@ After the Tablet has been disconnected, you can easily restore the
 previous state:
 
 ```
-python ./intuos4oled.py update
+intuos4oled.py update
 ```
+
+## Installation
+
+### Python
+
+You need a standard Python install. It should work with Python2 (for
+instance with Ubuntu 16.4) or Python3.
+
+If you just want to test, there is *nothing more* to do. But,
+depending on your system, you may have to run the script with `sudo`.
+
+In this case, it's easier to simply do once:
+```
+sudo ./intuos4oled.py init
+```
+And then for all subsequent calls, you don't need sudo anymore.
+
+### Permanent installation
+
+1. Make the script executable and move it to a location in you
+   `$PATH`. Here we use /usr/local/bin. This should work for everyone.
+
+```
+chmod 755 intuos4oled.py
+sudo cp intuos4oled.py /usr/local/bin/
+```
+
+2. By using `udev` rules the initialization will be done automagically
+   every time you plug in the tablet:
+
+```
+sudo cp 99-wacom.rules /etc/udev/rules.d/99-wacom.rules
+```
+(This might require a restart)
+
+3. Using your session-manager startup scripts, update the tablet with
+   `intuos4oled update` whenever you open a session.
+

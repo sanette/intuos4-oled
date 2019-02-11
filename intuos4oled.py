@@ -296,14 +296,10 @@ def get_path (ids):  # this is a bit slow (60ms?)
     """Find corresponding path in DEVICES_PATH.
     """
     vendor, product = ids
-    l = subprocess.check_output(["ls", DEVICES_PATH]) # python3 : result = bytes
-    l = l.splitlines()
-    if PY3:
-        l = [os.fsdecode(x) for x in l] # python3: convert bytes to str
+    l = os.listdir(DEVICES_PATH)
     file = [x for x in l if split_path(x) == (vendor, product)]
     if len(file) == 0:
-        print ("ERROR: no corresponding directory found in %s for device (%04x,%04x)"%(DEVICES_PATH, vendor, product))
-        exit (1)
+        raise Exception ("ERROR: no corresponding directory found in %s for device (%04x,%04x)"%(DEVICES_PATH, vendor, product))
     else:
         if len(file) > 1:
             print ("Warning: found more than one corresponding directory in %s"%DEVICES_PATH)

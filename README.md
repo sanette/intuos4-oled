@@ -102,7 +102,14 @@ sudo cp intuos4oled.py /usr/local/bin/
 ```
 
 2. By using `udev` rules the initialization will be done automagically
-   every time you plug in the tablet:
+   every time you plug in the tablet. For this to work, you need the
+   `at` scheduler. In ubuntu, type:
+
+```
+sudo apt install at
+```
+
+Then
 
 ```
 sudo mkdir /usr/local/lib/intuos4oled

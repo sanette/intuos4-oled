@@ -149,3 +149,10 @@ with standard tools:
   Inkscape, Firefox, etc.)
 
 * Write a game on the OLED screen and use the touch ring to play ;)
+
+## photos
+
+![test1](https://github.com/sanette/intuos4-oled/blob/master/tests/text_buttons.jpg)
+
+![test2](https://github.com/sanette/intuos4-oled/blob/master/tests/haiku.jpg)
+

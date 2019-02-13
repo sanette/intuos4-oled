@@ -117,11 +117,8 @@ sudo cp init.sh /usr/local/lib/intuos4oled/
 sudo cp 99-wacom.rules /etc/udev/rules.d/99-wacom.rules
 ```
 
-(This might require a restart, or instead you can type ``sudo udevadm
+(This might require a restart, or instead you can type `sudo udevadm
 control --reload-rules && udevadm trigger`)
-
-3. Using your session-manager startup scripts, update the tablet with
-   `intuos4oled update` whenever you open a session.
 
 ### Make it automatic
 

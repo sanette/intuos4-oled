@@ -5,7 +5,6 @@
 # send images to the Wacom Intuos4 OLEDs.
 # San Vu Ngoc, 2019
 #
-# Should be executed with sudo
 #
 
 import sys
@@ -15,6 +14,7 @@ import subprocess
 import os.path
 import argparse
 import tempfile
+import time
 
 import PIL.Image as Image
 import struct
@@ -148,6 +148,12 @@ def sudo_init (ids):
     path = get_path(ids)
     for button in range(8):
         btn_path = os.path.join(path, BUTTON%button)
+        for i in range(5):
+            if not os.path.exists(btn_path):
+                print ("Waiting for button %i"%button)
+                time.sleep(1)
+            else:
+                break
         os.chmod(btn_path, stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
     RWALL = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH
     led_path = os.path.join(path, STATUS_LED0)
@@ -368,7 +374,6 @@ def get_font_path (font):
     
 def text_to_img (text, output, font = DEFAULT_FONT, size = None, span = None):
 
-    print (span)
     span = 1 if span is None else span
     if size is None:
         resize = []
@@ -415,19 +420,19 @@ if __name__ == "__main__":
     commands = ['update', 'set', 'clear', 'init']
     parser = argparse.ArgumentParser()
     parser.add_argument("command", help=", ".join(commands))
+    parser.add_argument("-t", "--text", help="text message")
+    parser.add_argument("-i", "--image", help="image file")
+    parser.add_argument("-b", "--button", help="button number, between 0 and 7", type=int)
+    parser.add_argument("-s", "--span", help="if the image has to span over several buttons", type=int)
     parser.add_argument("-f", "--flip", action="store_true",
                         help="Flip images upside-down (for left-handed)")
-    parser.add_argument("--rv", action="store_true", help="Reverse video")
+    parser.add_argument("--font", help="Font to use for texts")
     parser.add_argument("--kr", action="store_true", help="Keep image ratio")
-    parser.add_argument("--nosync", action="store_true", help="Don't synchronize images with datafile")
-    parser.add_argument("-b", "--button", help="button number, between 0 and 7", type=int)
-    parser.add_argument("-i", "--image", help="image file")
+    parser.add_argument("--rv", action="store_true", help="Reverse video")
     parser.add_argument("--id", help="Wacom Tablet product ID")
     parser.add_argument("--lum", help="Oled luminance, between 0 and 15")
-    parser.add_argument("--font", help="Font to use for texts")
     parser.add_argument("--sync", help="Specify the file used to store and synchronize all images")
-    parser.add_argument("-t", "--text", help="text message")
-    parser.add_argument("-s", "--span", help="if the image has to span over several buttons", type=int)
+    parser.add_argument("--nosync", action="store_true", help="Don't synchronize images with datafile")
     args = parser.parse_args()
 
     if args.command not in commands:
@@ -446,6 +451,7 @@ if __name__ == "__main__":
     if args.command == 'init':
         sudo_init (ids)
         print ("Root initialization done.")
+        print (time.strftime('%X %x %Z'))
         exit (0)
 
     screen = Screen(ids, datafile = args.sync, sync = not args.nosync)
@@ -495,10 +501,3 @@ if __name__ == "__main__":
         screen.save()
     print ("Done")
     
-
-
-## TODO
-## daemon: https://dpbl.wordpress.com/2017/02/12/a-tutorial-on-python-daemon/
-## (check for led)
-## check KDE https://store.kde.org/p/1130333/show/page/2
-## https://github.com/PrzemoF/i4oled-gui

@@ -105,30 +105,47 @@ sudo cp intuos4oled.py /usr/local/bin/
    every time you plug in the tablet:
 
 ```
+sudo mkdir /usr/local/lib/intuos4oled
+sudo cp init.sh /usr/local/lib/intuos4oled/
 sudo cp 99-wacom.rules /etc/udev/rules.d/99-wacom.rules
 ```
-(This might require a restart)
+
+(This might require a restart, or instead you can type ``sudo udevadm
+control --reload-rules && udevadm trigger`)
 
 3. Using your session-manager startup scripts, update the tablet with
    `intuos4oled update` whenever you open a session.
 
+### Make it automatic
+
+To have a perfect installation, you want the OLED images to appear
+automatically when you plug the tablet in. For this, simply ask you
+Desktop environment (for instance, KDE, gnome...) to autoload the
+script `intuos4daemon.py` at login. (See also `~/.config/autostart` if
+you want to do it manually).
+
+To test this, you may use my sample datafile. Unplug the tablet,
+re-log into you session, then `cp sample.sync ~/.intuos`.  Then plug
+the tablet in, and wait 3-4 seconds for the images to appear.
+
 ## What about mapping keys to buttons?
 
-Well, I don't want to deal with this, because there are already very
-nice interfaces from the standard Desktop environments. For instance,
-the Wacom config from KDE is awesome. No need to do more!
+Well, at this point I don't want to deal with this, because there are
+already very nice interfaces from the standard Desktop
+environments. For instance, the Wacom config from KDE is awesome. 
 
-## More and more todo
+```
+kcmshell4 kcm_wacomtablet
+```
 
-A few things that I should consider because I don't see how to do it
-with the standard tools:
+## More and more
 
-* write a daemon to check the led status (0, 1, 2 or 3) and
-  automatically change icons correspondingly. Or, one could map the
-  central button to a script that does this.
+A few things that I should consider because I don't see how to do them
+with standard tools:
 
-* adapt my old 'follow-focus' daemon that will automatically switch
-  profile according to the application that has focus (Gimp, Inkscape,
-  Firefox, etc.)
+* write a better daemon (not in python, to reduce memory)
 
-* Write a game on the OLED screen and use the touch wheel to play ;)
+* automatic switch profile according to the application that has focus (Gimp,
+  Inkscape, Firefox, etc.)
+
+* Write a game on the OLED screen and use the touch ring to play ;)

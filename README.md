@@ -1,5 +1,5 @@
 # intuos4-oled
-send cool images and text to the Wacom Intuos 4 OLEDs on Linux.
+Send cool images and text to the Wacom Intuos 4 OLEDs on Linux.
 
 The Intuos4 is an old tablet, but it works well, and you can have fun
 playing with the small OLED screens.  There is built-in support in the
@@ -9,31 +9,27 @@ make it easy. It includes text messages, image processing, auto-saving
 profiles...
 
 ```
-usage: intuos4oled.py [-h] [-f] [--rv] [--kr] [--nosync] [-b BUTTON]
-                      [-i IMAGE] [--id ID] [--lum LUM] [--font FONT]
-                      [--sync SYNC] [-t TEXT] [-s SPAN]
-                      command
+usage: intuos4oled.py [-h] [-t TEXT] [-i IMAGE] [-b BUTTON] [-s SPAN] [-f] [--font FONT] [--kr] [--rv] [--id ID] [--lum LUM] [--sync SYNC] [--nosync] command
 
 positional arguments:
   command               update, set, clear, init
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f, --flip            Flip images upside-down (for left-handed)
-  --rv                  Reverse video
-  --kr                  Keep image ratio
-  --nosync              Don't synchronize images with datafile
-  -b BUTTON, --button BUTTON
-                        button number, between 0 and 7
+  -t TEXT, --text TEXT  text message
   -i IMAGE, --image IMAGE
                         image file
+  -b BUTTON, --button BUTTON
+                        button number, between 0 and 7
+  -s SPAN, --span SPAN  if the image has to span over several buttons
+  -f, --flip            Flip images upside-down (for left-handed)
+  --font FONT           Font to use for texts
+  --kr                  Keep image ratio
+  --rv                  Reverse video
   --id ID               Wacom Tablet product ID
   --lum LUM             Oled luminance, between 0 and 15
-  --font FONT           Font to use for texts
-  --sync SYNC           Specify the file used to store and synchronize all
-                        images
-  -t TEXT, --text TEXT  text message
-  -s SPAN, --span SPAN  if the image has to span over several buttons
+  --sync SYNC           Specify the file used to store and synchronize all images
+  --nosync              Don't synchronize images with datafile
 ```
 
 ## Examples
@@ -123,7 +119,7 @@ control --reload-rules && udevadm trigger`)
 ### Make it automatic
 
 To have a perfect installation, you want the OLED images to appear
-automatically when you plug the tablet in. For this, simply ask you
+automatically when you plug the tablet in. For this, simply ask your
 Desktop environment (for instance, KDE, gnome...) to autoload the
 script `intuos4daemon.py` at login. (See also `~/.config/autostart` if
 you want to do it manually).

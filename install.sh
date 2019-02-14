@@ -35,4 +35,6 @@ udevadm control --reload-rules && udevadm trigger
 su $user -c 'cp sample.sync $HOME/.intuos'
 su $user -c 'if [ -d $HOME/.config/autostart ]; then cp intuos4daemon.desktop $HOME/.config/autostart/; fi'
 
+$PREFIX/lib/intuos4oled/intuos4daemon.py
+
 echo "Installation completed. You may now plug the Intuos in."

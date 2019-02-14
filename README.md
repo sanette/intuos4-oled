@@ -66,13 +66,28 @@ intuos4oled.py update
 
 ## Installation
 
-### Quick test
-
 You need standard Python and Imagemagick installs. It should work both
 with Python2 (for instance with Ubuntu 16.4) or Python3.
 
-If you downloaded the [zip](https://github.com/sanette/intuos4-oled/archive/master.zip) from github, the script is already
+Get the archive, unzip, cd into it and run the install.sh script. That is, open a terminal and type the following lines (RETURN after each line):
+```
+cd /tmp
+wget https://github.com/sanette/intuos4-oled/archive/master.zip
+unzip master.zip
+cd intuos4-oled-master
+sudo ./install.sh $USER
+```
+That's it! You can now plug in the tablet.
+
+If you prefer to do it manually, step by step, here are the explanations:
+
+### Quick test
+
+If you downloaded the
+[zip](https://github.com/sanette/intuos4-oled/archive/master.zip) from
+github, unzipped it, and `cd` into it, then the script is already
 executable. But just in case, type:
+
 ``` chmod 755 intuos4oled.py ```
 
 There is nothing more to do to start testing. You can try:

@@ -42,6 +42,12 @@ def main ():
             s.load()
             _ = os.system('/bin/date >> %s'%TEMP)
         time.sleep(1)
-    
-with daemon.DaemonContext():
-    main()
+
+if os.system("pgrep -f intuos4daemon") == 0:       
+    print ("Intuos4daemon is already running.")
+    exit (1)
+else:
+    with daemon.DaemonContext():
+        main()
+
+

@@ -1,0 +1,16 @@
+[Desktop Entry]
+Comment=
+Exec=/usr/local/lib/intuos4oled/intuos4daemon.py
+GenericName=
+Icon=system-run
+MimeType=
+Name=Intuos4oled Daemon
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=

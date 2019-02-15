@@ -9,7 +9,9 @@ make it easy. It includes text messages, image processing, auto-saving
 profiles...
 
 ```
-usage: intuos4oled.py [-h] [-t TEXT] [-i IMAGE] [-b BUTTON] [-s SPAN] [-f] [--font FONT] [--kr] [--rv] [--id ID] [--lum LUM] [--sync SYNC] [--nosync] command
+usage: intuos4oled.py [-h] [-t TEXT] [-i IMAGE] [-b BUTTON] [-s SPAN]
+                      [-f] [--font FONT] [--kr] [--rv] [--id ID] [--lum LUM]
+                      [--sync SYNC] [--nosync] command
 
 positional arguments:
   command               update, set, clear, init
@@ -74,7 +76,7 @@ Installing intuos4oled goes as follows: get the archive, unzip, cd into
 it and run the install.sh script. That is, open a terminal and type
 the following lines (RETURN after each line):
 
-```
+```bash
 cd /tmp
 wget https://github.com/sanette/intuos4-oled/archive/master.zip
 unzip master.zip
@@ -126,7 +128,7 @@ sudo apt install at
 
 Then
 
-```
+```bash
 sudo mkdir /usr/local/lib/intuos4oled
 sudo cp init.sh /usr/local/lib/intuos4oled/
 sudo cp 99-wacom.rules /etc/udev/rules.d/99-wacom.rules
@@ -169,11 +171,13 @@ with standard tools:
 
 * Write a game on the OLED screen and use the touch ring to play ;)
 
-## photos
+## Photos
 
-Text is often more useful than images:
+### Text is often more useful than images:
+
 ![test1](https://github.com/sanette/intuos4-oled/blob/master/tests/text_buttons.jpg)
 
-But a Haiku and a nice image are good, too:
+### But a Haiku and a nice image are good, too:
+
 ![test2](https://github.com/sanette/intuos4-oled/blob/master/tests/haiku.jpg)
 

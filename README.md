@@ -68,8 +68,12 @@ intuos4oled.py update
 
 You need standard Python and Imagemagick installs. It should work both
 with Python2 (for instance with Ubuntu 16.4) or Python3.
+In addition you should install the `python-daemon` package.
 
-Get the archive, unzip, cd into it and run the install.sh script. That is, open a terminal and type the following lines (RETURN after each line):
+Installing intuos4oled goes as follows: get the archive, unzip, cd into
+it and run the install.sh script. That is, open a terminal and type
+the following lines (RETURN after each line):
+
 ```
 cd /tmp
 wget https://github.com/sanette/intuos4-oled/archive/master.zip
@@ -167,7 +171,9 @@ with standard tools:
 
 ## photos
 
+Text is often more useful than images:
 ![test1](https://github.com/sanette/intuos4-oled/blob/master/tests/text_buttons.jpg)
 
+But a Haiku and a nice image are good, too:
 ![test2](https://github.com/sanette/intuos4-oled/blob/master/tests/haiku.jpg)
 

@@ -70,7 +70,7 @@ intuos4oled.py update
 
 You need standard Python and Imagemagick installs. It should work both
 with Python2 (for instance with Ubuntu 16.4) or Python3.
-In addition you should install the `python-daemon` package.
+In addition you should install the `python-daemon` and `python-pil `packages.
 
 Installing intuos4oled goes as follows: get the archive, unzip, cd into
 it and run the install.sh script. That is, open a terminal and type
@@ -119,14 +119,7 @@ sudo cp intuos4oled.py /usr/local/bin/
 ```
 
 2. By using `udev` rules the initialization will be done automagically
-   every time you plug in the tablet. For this to work, you need the
-   `at` scheduler. In ubuntu, type:
-
-```
-sudo apt install at
-```
-
-Then
+   every time you plug in the tablet.
 
 ```bash
 sudo mkdir /usr/local/lib/intuos4oled

@@ -22,11 +22,6 @@ su $user -c "echo 'try user'"
 chmod 755 intuos4oled.py
 chmod 755 init.sh
 cp intuos4oled.py $PREFIX/bin/
-if ! [ `which at` ]
-then
-    echo "You should install the 'at' program first."
-    exit 1
-fi
 mkdir -p $PREFIX/lib/intuos4oled
 cp init.sh $PREFIX/lib/intuos4oled/
 cp intuos4daemon.py $PREFIX/lib/intuos4oled/
@@ -35,6 +30,6 @@ udevadm control --reload-rules && udevadm trigger
 su $user -c 'cp sample.sync $HOME/.intuos'
 su $user -c 'if [ -d $HOME/.config/autostart ]; then cp intuos4daemon.desktop $HOME/.config/autostart/; fi'
 
-$PREFIX/lib/intuos4oled/intuos4daemon.py
+su $user -c '/usr/local/lib/intuos4oled/intuos4daemon.py'
 
 echo "Installation completed. You may now plug the Intuos in."

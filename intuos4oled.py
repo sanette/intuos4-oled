@@ -148,7 +148,7 @@ def sudo_init (ids):
     path = get_path(ids)
     for button in range(8):
         btn_path = os.path.join(path, BUTTON%button)
-        for i in range(5):
+        for i in range(10):
             if not os.path.exists(btn_path):
                 print ("Waiting for button %i"%button)
                 time.sleep(1)

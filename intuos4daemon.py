@@ -1,9 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*
 #
+# this daemon should be run by the user, not root.
+# It watches the led status of the tablet and changes button images accordingly.
+#
+# This is part of intuos4oled
+#
+# San Vu Ngoc 2019
 #
 
-import daemon
+#import daemon
 import sys
 import os
 from os.path import exists
@@ -14,8 +20,9 @@ sys.path.append('/usr/local/bin')
 
 import intuos4oled as i4o
 
-TEMP = "/tmp/intuos_init"
-LOCK = "/tmp/intuos4oled.lock"
+USER = os.getenv('USER')
+TEMP = "/tmp/intuos4init-" + USER
+LOCK = "/tmp/intuos4oled-" + USER + ".lock"
 
 def at_exit(signum, frame):
     print ("Intuos4Daemon killed with signal %i."%signum)
@@ -44,8 +51,8 @@ def main ():
         try:
             s.update_led()
         except:
-            print ('Error. Intuos might be disconnected. Waiting for 3 sec.')
-            _ = os.system("echo 'LED ERROR' >> %s"%TEMP)
+            print ('Error reading LED. Intuos might be disconnected. Waiting for 3 sec.')
+            _ = os.system("echo 'Error reading LED. Intuos might be disconnected. Waiting for 3 sec.' >> %s"%TEMP)
             sleep(3)
             s = reset()
         if led != s.led:
@@ -58,7 +65,7 @@ if exists(LOCK):
     print ("Intuos4daemon is already running. If this is not the case, remove '%s'."%LOCK)
     exit (1)
 else:
-    with daemon.DaemonContext():
-        signal.signal(signal.SIGINT, at_exit)
-        signal.signal(signal.SIGTERM, at_exit)
-        main()
+    #with daemon.DaemonContext():
+    signal.signal(signal.SIGINT, at_exit)
+    signal.signal(signal.SIGTERM, at_exit)
+    main()

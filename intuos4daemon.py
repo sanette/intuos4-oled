@@ -37,7 +37,7 @@ def reset ():
             s = i4o.Screen()
             ok = True
         except:
-            print ("Error:", sys.exc_info()[0])
+            print (sys.exc_info()[0], file = stderr)
             print ('Cannot connect to the Intuos... retrying in 5 sec.')
             sleep(5)
     return (s)

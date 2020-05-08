@@ -57,6 +57,9 @@ intuos4oled.py set -t "Don't forget\nthe bread" -b 2 --font "Ubuntu-C.ttf"
 This will display some text on button #2. Notice how you can insert a
 line break with '\n', and change the font.
 
+*Warning* For text to work, you need to install the `imagemagick`
+ package.
+
 ## Restore images
 
 After the Tablet has been disconnected, you can easily restore the

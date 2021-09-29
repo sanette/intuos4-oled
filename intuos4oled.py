@@ -102,13 +102,13 @@ class Screen:
             filename = self.datafile
         print ("Saving to %s"%filename)
         with open(filename, 'wb') as outfile:
-            outfile.write("(%u,%u)\n"%(self.ids[0], self.ids[1]))
+            outfile.write(("(%u,%u)\n" % (self.ids[0], self.ids[1])).encode())
             for led in range(4):
                 for button in range(8):
                     if self.raw[led][button] is None:
-                        outfile.write("None\n")
+                        outfile.write("None\n".encode())
                     else:
-                        outfile.write("Raw:\n")
+                        outfile.write("Raw:\n".encode())
                         outfile.write(self.raw[led][button])
 
     def load(self, filename = None):
@@ -164,8 +164,8 @@ def sudo_init (ids):
 def set_luminance (path, luminance):
     lumi_path = os.path.join(path, LUMINANCE)
     with open(lumi_path, 'wb') as outfile:
-        outfile.write(str(luminance))
-    
+        outfile.write(str(luminance).encode())
+
 def img_to_raw (im, flip, rv, keep_ratio = False):
     """Convert an image to a raw 1024 bytearray for the Intuos4.
 

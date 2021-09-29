@@ -231,10 +231,10 @@ def img_to_raw (im, flip, rv, keep_ratio = False):
         
     # Convert grayscale image into interlaced 4bits raw bytes.
     (w, h) = (TARGET_WIDTH, TARGET_HEIGHT)
-    raw = bytearray(w*h/2)
+    raw = bytearray(int(w * h / 2))
     pos = 0
 
-    for j in range(h/2):
+    for j in range(int(h / 2)):
         (y, n1, n2) = (h - 2*j, -1, -2) if flip else (2*j, 0, 1)
         
         for i in range(w):
@@ -357,7 +357,7 @@ def clear_buttons (button, span, screen, flip):
     last_button = (button if span is None else
                        (button - span + 1 if flip else button + span - 1))
     r = range(min(button, last_button), max(button, last_button)+1)
-    raw = bytearray(TARGET_HEIGHT*TARGET_WIDTH/2)
+    raw = bytearray(int(TARGET_HEIGHT * TARGET_WIDTH / 2))
     for b in r:
         print ("Clearing button %u"%b)
         update_raw (raw, b, screen)

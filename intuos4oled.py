@@ -102,13 +102,13 @@ class Screen:
             filename = self.datafile
         print ("Saving to %s"%filename)
         with open(filename, 'wb') as outfile:
-            outfile.write("(%u,%u)\n"%(self.ids[0], self.ids[1]))
+            outfile.write(("(%u,%u)\n" % (self.ids[0], self.ids[1])).encode())
             for led in range(4):
                 for button in range(8):
                     if self.raw[led][button] is None:
-                        outfile.write("None\n")
+                        outfile.write("None\n".encode())
                     else:
-                        outfile.write("Raw:\n")
+                        outfile.write("Raw:\n".encode())
                         outfile.write(self.raw[led][button])
 
     def load(self, filename = None):
@@ -164,8 +164,8 @@ def sudo_init (ids):
 def set_luminance (path, luminance):
     lumi_path = os.path.join(path, LUMINANCE)
     with open(lumi_path, 'wb') as outfile:
-        outfile.write(str(luminance))
-    
+        outfile.write(str(luminance).encode())
+
 def img_to_raw (im, flip, rv, keep_ratio = False):
     """Convert an image to a raw 1024 bytearray for the Intuos4.
 
@@ -231,10 +231,10 @@ def img_to_raw (im, flip, rv, keep_ratio = False):
         
     # Convert grayscale image into interlaced 4bits raw bytes.
     (w, h) = (TARGET_WIDTH, TARGET_HEIGHT)
-    raw = bytearray(w*h/2)
+    raw = bytearray(int(w * h / 2))
     pos = 0
 
-    for j in range(h/2):
+    for j in range(int(h / 2)):
         (y, n1, n2) = (h - 2*j, -1, -2) if flip else (2*j, 0, 1)
         
         for i in range(w):
@@ -357,7 +357,7 @@ def clear_buttons (button, span, screen, flip):
     last_button = (button if span is None else
                        (button - span + 1 if flip else button + span - 1))
     r = range(min(button, last_button), max(button, last_button)+1)
-    raw = bytearray(TARGET_HEIGHT*TARGET_WIDTH/2)
+    raw = bytearray(int(TARGET_HEIGHT * TARGET_WIDTH / 2))
     for b in r:
         print ("Clearing button %u"%b)
         update_raw (raw, b, screen)

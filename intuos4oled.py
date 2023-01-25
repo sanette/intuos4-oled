@@ -1,9 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*
 
 #
 # send images to the Wacom Intuos4 OLEDs.
-# San Vu Ngoc, 2019
+# San Vu Ngoc, 2019-2023
 #
 #
 
@@ -19,7 +19,6 @@ import time
 import PIL.Image as Image
 import struct
 
-PY3 = sys.version_info.major == 3
 CONF_PATH = os.path.join(os.path.expanduser("~"), ".intuos")
 DEVICES_PATH = "/sys/bus/hid/devices/"
 WACOM_LED = "wacom_led"
@@ -362,7 +361,6 @@ def clear_buttons (button, span, screen, flip):
         print ("Clearing button %u"%b)
         update_raw (raw, b, screen)
 
-    
 def get_font_path (font):
     l = subprocess.check_output(["fc-list", font], text=True)
     l = l.splitlines()

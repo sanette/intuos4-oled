@@ -71,11 +71,12 @@ intuos4oled.py update
 
 ## Installation
 
-You need standard Python and Imagemagick installs. It should work both
-with Python2 (for instance with Ubuntu 16.4) or Python3.  In addition
-you should install the `python-pil `packages.  In order to react to
-udev events (plus/unplug) you also need the `at` scheduler: in Ubuntu,
-you can do `sudo apt install at python-pil`.
+You need standard Python 3 under `/usr/bin/python3` (if your python
+executable is somewhere else, just update the first line of the `*.py`
+files), and Imagemagick. In addition you should install the
+`python-pil` packages.  In order to react to udev events (plus/unplug)
+you also need the `at` scheduler: in Ubuntu, you can do `sudo apt
+install at python-pil`.
 
 Installing intuos4oled goes as follows: get the archive, unzip, cd into
 it and run the install.sh script. That is, open a terminal and type

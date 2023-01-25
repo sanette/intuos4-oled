@@ -364,7 +364,7 @@ def clear_buttons (button, span, screen, flip):
 
     
 def get_font_path (font):
-    l = subprocess.check_output(["fc-list"])
+    l = subprocess.check_output(["fc-list", font], text=True)
     l = l.splitlines()
     f = [x for x in l if font in x]
     if f == []:
